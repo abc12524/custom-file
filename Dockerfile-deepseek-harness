@@ -41,4 +41,4 @@ EXPOSE 3080
 CMD ["sh", "-c", "pnpm dsh web  & sleep 2 && socat TCP-LISTEN:3081,fork,reuseaddr TCP:127.0.0.1:3080"]
 
 #构建容器
-#docker run -d -p 3080:3080 --name deepseek-harness debian-deepseek-harness
+#docker run -d -p 3081:3080 --name deepseek-harness debian-deepseek-harness
