@@ -20,16 +20,17 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # ===== 第2步：克隆项目并安装 Python 依赖 =====
-# Debian 12+ 默认 PEP 668（externally-managed），容器内单应用直接放行
+# Debian 12+ 默认 PEP 668（externally-managed），容器内单应用直接放行；
+# 用 python3 -m pip 规避 pip/pip3 命令名差异
 RUN git clone https://github.com/abc12524/shell-tool.git /app && \
-    pip install --break-system-packages -r requirements.txt
+    python3 -m pip install --break-system-packages -r requirements.txt
 
 # ===== 第3步：暴露端口 =====
 EXPOSE 8000
 
 # ===== 第4步：启动命令（HTTP API 服务，监听 0.0.0.0:8000） =====
-# CLI 用法: docker exec -it shell-tool python dp.py "提问"
-CMD ["python", "server/api.py"]
+# CLI 用法: docker exec -it shell-tool python3 dp.py "提问"
+CMD ["python3", "server/api.py"]
 
 #构建容器
 #docker build -t shell-tool -f Dockerfile-shell-tool .
