@@ -1,0 +1,39 @@
+# 使用 Debian 最新版作为基础镜像
+FROM debian:latest
+
+# 设置环境变量，避免交互式安装提示
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /app
+
+# ===== 第1步：安装系统基础工具和 Python 环境 =====
+RUN apt-get update && \
+    apt-get install -y \
+    bash \
+    vim \
+    curl \
+    wget \
+    git \
+    python3 \
+    python3-pip \
+    python3-venv \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# ===== 第2步：克隆项目并安装 Python 依赖 =====
+# Debian 12+ 默认 PEP 668（externally-managed），容器内单应用直接放行
+RUN git clone https://github.com/abc12524/shell-tool.git /app && \
+    pip install --break-system-packages -r requirements.txt
+
+# ===== 第3步：暴露端口 =====
+EXPOSE 8000
+
+# ===== 第4步：启动命令（HTTP API 服务，监听 0.0.0.0:8000） =====
+# CLI 用法: docker exec -it shell-tool python dp.py "提问"
+CMD ["python", "server/api.py"]
+
+#构建容器
+#docker build -t shell-tool -f Dockerfile-shell-tool .
+#最小运行（只需 DeepSeek key，DB 自动降级 SQLite，搜索/记忆可选后配）:
+#docker run -d -p 8000:8000 --name shell-tool -e DEEPSEEK_API_KEY=sk-xxx shell-tool
+#完整配置（百度搜索/OpenViking/MySQL）:
+#docker run -d -p 8000:8000 --name shell-tool --env-file .env shell-tool
